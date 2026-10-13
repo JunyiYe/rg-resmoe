@@ -1,0 +1,10 @@
+# Paper runs used torch 2.x + CUDA on a single NVIDIA A100 40GB per training run;
+# any torch >= 2.0 with GPU support works. Training is bit-exact at a fixed seed.
+torch>=2.0
+numpy>=1.24
+pandas>=2.0
+pyarrow>=14.0
+scipy>=1.10
+scikit-learn>=1.3
+arch>=6.0
+yfinance>=0.2   # only needed for src/download_data_jp.py; shipped data/raw_jp/ works without it
