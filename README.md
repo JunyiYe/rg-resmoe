@@ -10,27 +10,29 @@ only to *route* between experts — never fed into the forecast itself.
 
 ## Why this paper
 
-Financial markets move through regimes — calm periods, crises, recoveries —
-and a growing line of work uses mixture-of-experts (MoE) architectures to
-handle this, on the intuition that different experts can specialize in
-different market conditions. These models often do outperform plain
-baselines, but it's rarely clear *why*. A typical MoE setup changes several
-things at once relative to its baseline: it exposes the model to regime
-information it didn't have before, it adds parameters (more experts, a
-gating network), and it introduces a new architectural mechanism (routing
-between specialized sub-models). Any of these three could be driving the
-improvement, and most papers don't separate them.
+Financial markets move through regimes — calm periods, crises, recoveries.
+A growing line of work uses mixture-of-experts (MoE) architectures to
+handle this: the idea is that different experts can specialize in different
+market conditions. These models often beat plain baselines. But it's rarely
+clear *why*.
+
+A typical MoE setup changes three things at once relative to its baseline.
+It exposes the model to regime information it didn't have before. It adds
+parameters (more experts, a gating network). And it introduces a new
+mechanism — routing between specialized sub-models. Any of the three could
+be driving the improvement, and most papers don't separate them.
 
 This paper isolates that question. We hold the regime information, the
 parameter budget, and the tuning/evaluation protocol fixed across every
-model we compare, and vary only *how* — and *whether* — regime information
-reaches the model. That lets us ask cleanly: does the gain come from having
-the information, from having more capacity, or from the gating/expert
-architecture itself? The answer turns out to be the architecture: giving the
-same regime variables to a plain MLP's input hurts it, while routing them
-through an MoE gate (with no extra information and comparable capacity)
-helps — the benefit is where the information enters the model, not how much
-of it there is.
+model we compare. The only thing we vary is *how* — and *whether* —
+regime information reaches the model. That lets us ask cleanly: does the
+gain come from having the information, from having more capacity, or from
+the gating/expert architecture itself?
+
+The answer is the architecture. Giving the same regime variables to a plain
+MLP's input hurts it. Routing them through an MoE gate instead — same
+information, comparable capacity — helps. The benefit comes from *where*
+the information enters the model, not from how much of it there is.
 
 ## How it works
 
@@ -82,13 +84,14 @@ Everything else (`data/processed/`, `results/predictions/`,
 
 ## Reproducing a specific result
 
-`src/train_rg_resmoe.py` is the main model; a handful of environment
-variables switch it into the other configurations reported in the paper
-(expert count, routing style, whether the gate sees regime info, etc.),
-and `src/train_mlp.py` / `src/train_standard_moe.py` / `src/train_rule_gate_moe.py`
-cover the baselines and routing variants being compared against. If
-you're trying to match a specific table or number in the paper, open
-`reproduce.sh` — it lists every model/flag combination as a single
+`src/train_rg_resmoe.py` is the main model. A handful of environment
+variables switch it into the other configurations reported in the paper —
+expert count, routing style, whether the gate sees regime info. The
+baselines and routing variants it's compared against live in
+`src/train_mlp.py`, `src/train_standard_moe.py`, and `src/train_rule_gate_moe.py`.
+
+If you're trying to match a specific table or number in the paper, open
+`reproduce.sh` instead — it lists every model/flag combination as a single
 runnable command, in the order the tables need them.
 
 ## Notes
