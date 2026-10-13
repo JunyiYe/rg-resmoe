@@ -18,21 +18,26 @@ clear *why*.
 
 A typical MoE setup changes three things at once relative to its baseline.
 It exposes the model to regime information it didn't have before. It adds
-parameters (more experts, a gating network). And it introduces a new
-mechanism — routing between specialized sub-models. Any of the three could
-be driving the improvement, and most papers don't separate them.
+parameters — usually a lot of them, since an MoE baseline is commonly
+compared against a much smaller plain MLP, not one with a matching
+parameter count. And it introduces a new mechanism — routing between
+specialized sub-models. Any of the three could be driving the improvement,
+but most papers compare against an MLP with far fewer parameters, so
+capacity and architecture are never actually separated.
 
-This paper isolates that question. We hold the regime information, the
-parameter budget, and the tuning/evaluation protocol fixed across every
-model we compare. The only thing we vary is *how* — and *whether* —
-regime information reaches the model. That lets us ask cleanly: does the
-gain come from having the information, from having more capacity, or from
-the gating/expert architecture itself?
+This paper isolates that question. Every model we compare has a matched
+parameter budget, the same regime information available to it, and the
+same tuning/evaluation protocol. The only thing we vary is *how* — and
+*whether* — regime information reaches the model. That lets us ask
+cleanly: does the gain come from having the information, from having more
+capacity, or from the gating/expert architecture itself?
 
-The answer is the architecture. Giving the same regime variables to a plain
-MLP's input hurts it. Routing them through an MoE gate instead — same
-information, comparable capacity — helps. The benefit comes from *where*
-the information enters the model, not from how much of it there is.
+The answer is the architecture, not capacity. Against a plain MLP with the
+*same* parameter count as RG-ResMoE, giving that MLP the same regime
+variables at its input still hurts it — while routing those same variables
+through an MoE gate helps. Same information, same capacity, opposite
+outcome. The benefit comes from *where* the information enters the model,
+not from how much of it there is, and not from having more parameters.
 
 ## How it works
 
