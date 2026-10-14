@@ -82,6 +82,10 @@ for name, series in daily.items():
 
 print(f"\n{'A':12s} {'B':8s} {'metric':6s} {'seed-mean diff':>16s} {'DM stat':>10s} {'p':>10s} {'n':>6s}")
 for a, b in PAIRS:
+    if not daily[a] or not daily[b]:
+        missing = a if not daily[a] else b
+        print(f"{a} vs {b}: skipped, no seeds loaded for {missing}")
+        continue
     for metric in METRICS:
         a_df = pd.concat([s[metric] for s in daily[a]], axis=1).mean(axis=1)
         b_df = pd.concat([s[metric] for s in daily[b]], axis=1).mean(axis=1)

@@ -55,7 +55,6 @@ from walk_forward import (
     TARGET,
     TRAIN_WINDOW_DAYS,
     _split_train_val,
-    diebold_mariano,
 )
 
 RESIDUAL_LR = float(os.environ.get("EXPERT_LR", "0.01"))

@@ -52,7 +52,6 @@ from walk_forward import (
     TARGET,
     TRAIN_WINDOW_DAYS,
     _split_train_val,
-    diebold_mariano,
 )
 
 GATE_AUX_FEATURES = ["market_vol_20", "idio_vol_20"]
