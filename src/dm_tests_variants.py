@@ -47,6 +47,7 @@ PAIRS = [
     ("RG-ResMoE", "volatility quantiles"),
     ("RG-ResMoE", "GICS sectors"),
     ("RG-ResMoE", "market x idio split"),
+    ("RG-ResMoE", "RG-ResMoE-K2"),
     ("RG-ResMoE", "RG-ResMoE-K6"),
     ("RG-ResMoE", "Standard MoE"),
     ("RG-ResMoE", "random init"),

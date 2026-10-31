@@ -28,13 +28,12 @@ REF = ("RG-ResMoE",
        "residual_pred", N_SEEDS)
 
 BASELINES = {
-    "RG-ResMoE-K2": (f"{BASE}/rg_resmoe_k2_matched/seed{{s}}.parquet", "residual_pred", N_SEEDS),
     "MLP-L":        (f"{BASE}/mlp_l/seed{{s}}.parquet", "plain_pred", N_SEEDS),
     "MLP-S":        (f"{BASE}/mlp_s/seed{{s}}.parquet", "plain_pred", N_SEEDS),
     "Standard MoE": (f"{BASE}/standard_moe/seed{{s}}.parquet", "residual_pred", N_SEEDS),
     "HAR":          (f"{BASE}/classical/har.parquet",         "har_pred",         1),
     "Ridge":        (f"{BASE}/classical/ridge.parquet",       "ridge_pred",       1),
-    "Ridge+state":  (f"{BASE}/classical/ridge_state.parquet", "ridge_state_pred", 1),
+    "Ridge(+z)":  (f"{BASE}/classical/ridge_state.parquet", "ridge_state_pred", 1),
     "GARCH(1,1)":   (f"{BASE}/classical/garch.parquet",       "garch_pred",       1),
     "Persistence":  (f"{BASE}/classical/persistence.parquet", "hist_vol_pred",    1),
 }

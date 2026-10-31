@@ -31,7 +31,7 @@ MODELS = {
     "Standard MoE":   (f"{BASE}/standard_moe/seed{{s}}.parquet",         "residual_pred", N_SEEDS),
     "HAR":            (f"{BASE}/classical/har.parquet",         "har_pred",         1),
     "Ridge":          (f"{BASE}/classical/ridge.parquet",       "ridge_pred",       1),
-    "Ridge+state":    (f"{BASE}/classical/ridge_state.parquet", "ridge_state_pred", 1),
+    "Ridge(+z)":    (f"{BASE}/classical/ridge_state.parquet", "ridge_state_pred", 1),
     "GARCH(1,1)":     (f"{BASE}/classical/garch.parquet",       "garch_pred",       1),
     "Persistence":    (f"{BASE}/classical/persistence.parquet", "hist_vol_pred",    1),
 }
