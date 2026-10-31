@@ -58,10 +58,12 @@ for s in $(seq 0 $((N_SEEDS - 1))); do
   fi
 done
 
-# 4. Aggregate: headline metrics, significance, collapse counts
+# 4. Aggregate: headline metrics, significance, collapse counts, VaR, stress slices
 N_SEEDS=$N_SEEDS python src/summarize_results.py
 N_SEEDS=$N_SEEDS python src/dm_tests.py
 N_SEEDS=$N_SEEDS python src/collapse_rates.py
+N_SEEDS=$N_SEEDS python src/var_backtest.py
+N_SEEDS=$N_SEEDS python src/stress_slices.py
 if [ "${RUN_ABLATIONS:-0}" = "1" ]; then
   N_SEEDS=$N_SEEDS python src/dm_tests_variants.py
 fi
