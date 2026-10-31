@@ -74,7 +74,7 @@ def build_slices():
     flips = regime.index[regime.ne(regime.shift(1)).fillna(False)]
     flip_window = set()
     for fd in flips:
-        idx = np.searchsorted(dates, fd)
+        idx = mvol.index.searchsorted(fd)
         lo, hi = max(0, idx - 10), min(len(dates), idx + 11)
         flip_window.update(dates[lo:hi])
 
