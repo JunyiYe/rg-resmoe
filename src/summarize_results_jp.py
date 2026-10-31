@@ -70,6 +70,10 @@ def _fmt(vals, fmt=".4f", width=16):
     arr = np.array([v for v in vals if np.isfinite(v)])
     if len(arr) == 0:
         return "—".rjust(width)
+    if len(arr) == 1:
+        # A one-seed run has no spread; show the value alone rather than a
+        # misleading "+/-0.0000". Same convention as summarize_results.py.
+        return ("{:" + str(width) + fmt + "}").format(arr[0])
     s = format(arr.mean(), fmt) + " +/-" + format(arr.std(), fmt)
     return (s + " " * width)[:width]
 

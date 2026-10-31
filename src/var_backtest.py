@@ -134,12 +134,18 @@ for alpha in ALPHAS:
             if model == REF:
                 continue
             m_vals = sub[sub["model"] == model]["frac_kupiec_reject"].dropna().values
-            n = min(len(ref_vals), len(m_vals))
-            if n < 2:
+            if len(m_vals) == 0:
                 line += f"  {'(no data)':>18}"
                 continue
-            t, p = stats.ttest_rel(ref_vals[:n], m_vals[:n])
-            sig = "n.s." if p >= 0.05 else f"p={p:.4f}"
+            n = min(len(ref_vals), len(m_vals))
+            if n < 2:
+                # The paired t-test needs >= 2 seeds (the paper uses 30).
+                # Below that, still report the rejection level itself rather
+                # than dropping the baseline column from the table.
+                sig = "1 seed"
+            else:
+                t, p = stats.ttest_rel(ref_vals[:n], m_vals[:n])
+                sig = "n.s." if p >= 0.05 else f"p={p:.4f}"
             line += f"  {m_vals.mean()*100:>6.1f}% ({sig:>7})"
         _print(line)
 

@@ -63,7 +63,14 @@ def build_one(path: pathlib.Path, ticker: str, sector: str) -> pd.DataFrame:
     # below rather than silently biasing vol/momentum features and the target.
     df.loc[df["Volume"] == 0, price_cols] = np.nan
 
-    df["log_ret"] = np.log(df["Adj Close"]).diff()
+    # A handful of JP tickers carry a negative Adj Close on some days (a
+    # vendor artifact of large dividend/split adjustments). np.log already
+    # yields NaN there; masking first makes that explicit and keeps the
+    # build quiet instead of emitting an "invalid value in log" warning.
+    # Identical output: the shipped panels contain no zero Adj Close, so
+    # this NaNs exactly the rows np.log would have NaN'd anyway.
+    adj_close = df["Adj Close"].where(df["Adj Close"] > 0)
+    df["log_ret"] = np.log(adj_close).diff()
     # realized vol = annualized rolling std of daily log returns
     df["vol_5"] = df["log_ret"].rolling(5).std() * np.sqrt(252)
     df["vol_20"] = df["log_ret"].rolling(20).std() * np.sqrt(252)
