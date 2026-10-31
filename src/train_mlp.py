@@ -27,7 +27,6 @@ from walk_forward import (
     CHECK_EVERY,
     DEVICE,
     FEATURES,
-    LR,
     MAX_EPOCHS,
     PATIENCE_CHECKS,
     PROCESSED_DIR,

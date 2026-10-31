@@ -25,7 +25,6 @@ US      = "results/predictions"
 MODELS = {
     "RG-ResMoE":   (f"{US}/rg_resmoe/seed{{s}}.parquet", "residual_pred"),
     "RG-ResMoE-K2":      (f"{US}/rg_resmoe_k2_matched/seed{{s}}.parquet", "residual_pred"),
-    "RG-ResMoE-K2-unmatched": (f"{US}/rg_resmoe_k2/seed{{s}}.parquet", "residual_pred"),
     "RG-ResMoE-K6":      (f"{US}/rg_resmoe_k6_matched/seed{{s}}.parquet", "residual_pred"),
     "learned top-1 (hard)":     (f"{US}/rg_resmoe_hard_routing/seed{{s}}.parquet", "residual_pred"),
     "random init":   (f"{US}/rg_resmoe_random_init/seed{{s}}.parquet", "residual_pred"),
@@ -48,7 +47,6 @@ PAIRS = [
     ("RG-ResMoE", "volatility quantiles"),
     ("RG-ResMoE", "GICS sectors"),
     ("RG-ResMoE", "market x idio split"),
-    ("RG-ResMoE", "RG-ResMoE-K2-unmatched"),
     ("RG-ResMoE", "RG-ResMoE-K6"),
     ("RG-ResMoE", "Standard MoE"),
     ("RG-ResMoE", "random init"),
@@ -56,11 +54,6 @@ PAIRS = [
     # tab:pathway — each 18f MLP vs its own 16f baseline
     ("MLP-L(+z)", "MLP-L"),
     ("MLP-S(+z)", "MLP-S"),
-    # ladder: unmatched K=2 (soft) vs each hard variant
-    ("RG-ResMoE-K2-unmatched", "learned top-1 (hard)"),
-    ("RG-ResMoE-K2-unmatched", "volatility quantiles"),
-    ("RG-ResMoE-K2-unmatched", "GICS sectors"),
-    ("RG-ResMoE-K2-unmatched", "market x idio split"),
     # Standard MoE vs the plain MLPs
     ("Standard MoE", "MLP-L"),
     ("Standard MoE", "MLP-S"),

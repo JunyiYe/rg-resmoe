@@ -27,7 +27,6 @@ MODELS = {
     # label: (pattern, pred col)
     "RG-ResMoE":              (f"{BASE}/rg_resmoe/seed{{s}}.parquet", "residual_pred"),
     "RG-ResMoE-K2":           (f"{BASE}/rg_resmoe_k2_matched/seed{{s}}.parquet", "residual_pred"),
-    "RG-ResMoE-K2-unmatched": (f"{BASE}/rg_resmoe_k2/seed{{s}}.parquet", "residual_pred"),
     "RG-ResMoE-K6":           (f"{BASE}/rg_resmoe_k6_matched/seed{{s}}.parquet", "residual_pred"),
     "learned top-1 (hard)":   (f"{BASE}/rg_resmoe_hard_routing/seed{{s}}.parquet", "residual_pred"),
     "RG-ResMoE (-z)":         (f"{BASE}/rg_resmoe_no_states/seed{{s}}.parquet", "residual_pred"),

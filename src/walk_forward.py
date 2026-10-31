@@ -37,7 +37,6 @@ TRAIN_WINDOW_DAYS = int(os.environ.get("TRAIN_WINDOW_DAYS", "504"))
 STEP_DAYS = int(os.environ.get("STEP_DAYS", "63"))
 LR = 1e-2
 LB_WEIGHT = 0.05
-SEED = 0
 
 VAL_FRAC = 0.15
 CHECK_EVERY = 5

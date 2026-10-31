@@ -14,7 +14,6 @@ Output:
 import os, datetime
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
 
 OUT_FILE = "results/summary/final_metrics.txt"
 BASE    = "results/predictions"
@@ -55,16 +54,6 @@ def fast_ic(df, col, min_n=20):
         include_groups=False)
     return (num/den).replace([np.inf,-np.inf], np.nan).dropna().values
 
-def decile_ic(df, col, q_lo, q_hi, min_n=5):
-    lo  = df.groupby("Date")[col].transform(lambda x: x.quantile(q_lo))
-    hi  = df.groupby("Date")[col].transform(lambda x: x.quantile(q_hi))
-    sub = df[(df[col] >= lo) & (df[col] <= hi)].copy()
-    cnt = sub.groupby("Date")[col].transform("count")
-    sub = sub[cnt >= min_n]
-    if sub.empty:
-        return np.array([np.nan])
-    return fast_ic(sub, col, min_n=min_n)
-
 def qlike(pred, target):
     p = np.maximum(pred,   CLIP)
     t = np.maximum(target, CLIP)
@@ -83,16 +72,6 @@ def ivol_sharpe(df, col, min_n=20):
     if len(d) < 10 or d.std() < 1e-10:
         return np.nan, np.nan, d
     return d.mean() / d.std() * np.sqrt(252), d.mean() * 252, d
-
-def nw_var(d, max_lag=4):
-    t = len(d); dc = d - d.mean(); v = (dc**2).sum() / t
-    for lag in range(1, max_lag + 1):
-        v += 2*(1-lag/(max_lag+1))*(dc[:-lag]*dc[lag:]).sum()/t
-    return max(v/t, 1e-30)
-
-def dm(diff):
-    stat = diff.mean() / np.sqrt(nw_var(diff))
-    return stat, 2*(1-norm.cdf(abs(stat)))
 
 # ── dual output ───────────────────────────────────────────────────────────────
 os.makedirs(os.path.dirname(OUT_FILE), exist_ok=True)

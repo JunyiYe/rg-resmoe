@@ -29,7 +29,6 @@ Output: results/predictions/rg_resmoe_no_states/seed{SEED}.parquet
 """
 import copy
 import os
-import sys
 
 import numpy as np
 import pandas as pd
