@@ -15,8 +15,11 @@ mkdir -p results/summary
 [ -f data/processed/panel_systemic.parquet ] || python src/add_regime_states.py
 
 # 2. Classical baselines (CPU, deterministic): Persistence, HAR, GARCH, Ridge(+z)
-[ -f "$P/classical/garch.parquet" ] || python src/train_classical_baselines.py
-[ -f "$P/classical/ridge.parquet" ] || python src/train_ridge.py
+# Each guard names the LAST file its script writes, so an interrupted run
+# (GARCH alone takes ~10 min) is resumed rather than silently skipped with
+# only its earlier outputs on disk.
+[ -f "$P/classical/persistence.parquet" ]  || python src/train_classical_baselines.py
+[ -f "$P/classical/ridge_state.parquet" ]  || python src/train_ridge.py
 
 # 3. Neural models, 30 seeds each (GPU). run <output> <ENV=val ...> <cmd ...>
 run() {
@@ -59,11 +62,13 @@ for s in $(seq 0 $((N_SEEDS - 1))); do
 done
 
 # 4. Aggregate: headline metrics, significance, collapse counts, VaR, stress slices
-N_SEEDS=$N_SEEDS python src/summarize_results.py
-N_SEEDS=$N_SEEDS python src/dm_tests.py
-N_SEEDS=$N_SEEDS python src/collapse_rates.py
-N_SEEDS=$N_SEEDS python src/var_backtest.py
-N_SEEDS=$N_SEEDS python src/stress_slices.py
-if [ "${RUN_ABLATIONS:-0}" = "1" ]; then
-  N_SEEDS=$N_SEEDS python src/dm_tests_variants.py
-fi
+N_SEEDS=$N_SEEDS python src/summarize_results.py   # Table 3
+N_SEEDS=$N_SEEDS python src/dm_tests.py            # Table 3 significance
+N_SEEDS=$N_SEEDS python src/collapse_rates.py      # Collapse column, Tables 3-6
+N_SEEDS=$N_SEEDS python src/var_backtest.py        # Table 7
+N_SEEDS=$N_SEEDS python src/stress_slices.py       # Table 8
+# Table 4 (regime-information pathway: the +z MLPs and RG-ResMoE(-z)) is built
+# from models the default loop above already trains, so this runs either way.
+# With RUN_ABLATIONS=1 the same script additionally fills Tables 5-6; without
+# it, those rows print "MISSING FILES, skipped".
+N_SEEDS=$N_SEEDS python src/dm_tests_variants.py   # Table 4 (+ Tables 5-6 if trained)
