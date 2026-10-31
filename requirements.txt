@@ -2,7 +2,9 @@
 # any torch >= 2.0 with GPU support works. Training is bit-exact at a fixed seed.
 torch>=2.0
 numpy>=1.24
-pandas>=2.0
+# pandas >= 2.2 specifically: the aggregation scripts use
+# groupby.apply(..., include_groups=False), a keyword added in 2.2.0.
+pandas>=2.2
 pyarrow>=14.0
 scipy>=1.10
 scikit-learn>=1.3
