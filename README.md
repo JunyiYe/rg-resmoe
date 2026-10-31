@@ -1,7 +1,7 @@
 # RG-ResMoE
 
 **Regime-Gated Residual Mixture-of-Experts for Cross-Sectional Volatility Forecasting**
-Junyi Ye, Gargi Vijay Borde · accepted to ICAIF '26 · [paper PDF](paper/RG-ResMoE_ICAIF26.pdf)
+Junyi Ye, Gargi Vijay Borde · ICAIF '26 · [paper PDF](paper/RG-ResMoE_ICAIF26.pdf) · [doi:10.1145/3858063.3858798](https://doi.org/10.1145/3858063.3858798)
 
 This repo contains the code and data behind the paper. It forecasts
 five-day stock volatility for over 1,000 U.S. equities, and shows that a
@@ -111,16 +111,21 @@ runnable command, in the order the tables need them.
 
 ## Citation
 
+If you find this repo useful, please consider giving it a star ⭐ and citing the paper:
+
 ```bibtex
 @inproceedings{ye2026rgresmoe,
   title     = {Regime-Gated Residual Mixture-of-Experts for Cross-Sectional Volatility Forecasting},
   author    = {Ye, Junyi and Borde, Gargi Vijay},
   booktitle = {Proceedings of the 7th ACM International Conference on AI in Finance (ICAIF '26)},
-  year      = {2026}
+  year      = {2026},
+  address   = {Milan, Italy},
+  publisher = {ACM},
+  doi       = {10.1145/3858063.3858798}
 }
 ```
 
 ## License
 
 MIT (see LICENSE). Raw price data derive from Yahoo Finance and are provided
-for research reproducibility only.
+for research reproducibility only. The paper PDF is CC BY 4.0.
