@@ -111,6 +111,19 @@ def all_daily(df, col):
 # ── pass 1: per-(model, seed) daily series ─────────────────────────────────
 series = {}   # (model, seed) -> {metric: Series}
 ic_means = {} # model -> list of per-seed time-mean IC
+# Mirror the report to results/summary/ as well as stdout, same convention
+# as summarize_results.py / var_backtest.py / stress_slices.py.
+OUT_FILE = "results/summary/dm_tests_variants.txt"
+os.makedirs(os.path.dirname(OUT_FILE), exist_ok=True)
+_fh = open(OUT_FILE, "w")
+
+
+def _print(*args, **kwargs):
+    print(*args, **kwargs)
+    kwargs.pop("file", None)
+    print(*args, **kwargs, file=_fh)
+
+
 for name, (pat, col) in MODELS.items():
     ic_means[name] = []
     n_loaded = 0
@@ -123,23 +136,27 @@ for name, (pat, col) in MODELS.items():
         ic_means[name].append(series[(name, s)]["IC"].mean())
         n_loaded += 1
         del df
-    print(f"loaded {name}: {n_loaded}/{N_SEEDS} seeds", flush=True)
+    _print(f"loaded {name}: {n_loaded}/{N_SEEDS} seeds", flush=True)
 
-print("\n== per-variant IC over seeds (time-mean of daily IC) ==")
+_print("\n== per-variant IC over seeds (time-mean of daily IC) ==")
 for name, v in ic_means.items():
-    if v:
-        print(f"  {name:14s} IC = {np.mean(v):.4f} +/- {np.std(v, ddof=1):.4f}  (n={len(v)})")
+    if not v:
+        continue
+    # ddof=1 is undefined for a single seed (prints "+/- nan"); report the
+    # mean alone there, same convention as summarize_results.py.
+    spread = f" +/- {np.std(v, ddof=1):.4f}" if len(v) > 1 else ""
+    _print(f"  {name:14s} IC = {np.mean(v):.4f}{spread}  (n={len(v)})")
 
 # ── pass 2: pairwise DM ─────────────────────────────────────────────────────
 hdr = (f"\n{'A (ref)':14s} {'B':14s} {'metric':6s} {'delta':>10} "
        f"{'DM_new':>8} {'p_new':>8} {'sig':4} {'n_days':>6}")
-print(hdr)
-print("-" * len(hdr))
+_print(hdr)
+_print("-" * len(hdr))
 for a, b in PAIRS:
     seeds_a = sorted(s for (n, s) in series if n == a)
     seeds_b = sorted(s for (n, s) in series if n == b)
     if not seeds_a or not seeds_b:
-        print(f"{a:14s} {b:14s} MISSING FILES, skipped")
+        _print(f"{a:14s} {b:14s} MISSING FILES, skipped")
         continue
     for metric in METRICS:
         diffs = []
@@ -149,6 +166,9 @@ for a, b in PAIRS:
         d_t = pd.concat(diffs, axis=1).mean(axis=1).dropna()
         stat, p = dm_stat(d_t.values)
         sig = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
-        print(f"{a:14s} {b:14s} {metric:6s} {d_t.mean():>+10.5f} "
+        _print(f"{a:14s} {b:14s} {metric:6s} {d_t.mean():>+10.5f} "
               f"{stat:>+8.3f} {p:>8.4f} {sig:4} {len(d_t):>6}")
-    print()
+    _print()
+
+_fh.close()
+print(f"\nSaved to {OUT_FILE}")

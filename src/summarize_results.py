@@ -23,9 +23,11 @@ CLIP    = 1e-4
 N_SEEDS = int(os.environ.get("N_SEEDS", "30"))  # neural models; classical baselines are deterministic
 
 MODELS = {
+    # Table 3's rows, plus Ridge(+z) -- the one Table 4 (pathway) entry that
+    # is deterministic and so has no IC reported anywhere else. The K2/K6
+    # expert-count variants belong to Table 6, not here; dm_tests_variants.py
+    # reports their IC +/- std.
     "RG-ResMoE":      (f"{BASE}/rg_resmoe/seed{{s}}.parquet",            "residual_pred", N_SEEDS),
-    "RG-ResMoE-K2":   (f"{BASE}/rg_resmoe_k2_matched/seed{{s}}.parquet", "residual_pred", N_SEEDS),
-    "RG-ResMoE-K6":   (f"{BASE}/rg_resmoe_k6_matched/seed{{s}}.parquet", "residual_pred", N_SEEDS),
     "MLP-L":          (f"{BASE}/mlp_l/seed{{s}}.parquet",                "plain_pred",    N_SEEDS),
     "MLP-S":          (f"{BASE}/mlp_s/seed{{s}}.parquet",                "plain_pred",    N_SEEDS),
     "Standard MoE":   (f"{BASE}/standard_moe/seed{{s}}.parquet",         "residual_pred", N_SEEDS),

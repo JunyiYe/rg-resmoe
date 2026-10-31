@@ -111,18 +111,31 @@ def load(pat, n):
     return out
 
 
-print(f"Loading reference {REF[0]} ({REF[3]} seeds)...")
+# Mirror the report to results/summary/ as well as stdout, same convention
+# as summarize_results.py / var_backtest.py / stress_slices.py.
+OUT_FILE = "results/summary/dm_tests.txt"
+os.makedirs(os.path.dirname(OUT_FILE), exist_ok=True)
+_fh = open(OUT_FILE, "w")
+
+
+def _print(*args, **kwargs):
+    print(*args, **kwargs)
+    kwargs.pop("file", None)
+    print(*args, **kwargs, file=_fh)
+
+
+_print(f"Loading reference {REF[0]} ({REF[3]} seeds)...")
 ref_dfs = load(REF[1], REF[3])
-print(f"  {len(ref_dfs)} loaded")
+_print(f"  {len(ref_dfs)} loaded")
 
 hdr = f"{'Baseline':18s} {'metric':7s} {'delta':>10} {'DM':>8} {'p':>8} {'sig':4}"
-print(hdr)
-print("-" * len(hdr))
+_print(hdr)
+_print("-" * len(hdr))
 
 for bname, (bpat, bcol, bn) in BASELINES.items():
     b_dfs = load(bpat, bn)
     if not b_dfs:
-        print(f"{bname}: no files, skipped")
+        _print(f"{bname}: no files, skipped")
         continue
     for metric in METRICS:
         per_seed_diffs = []
@@ -142,5 +155,8 @@ for bname, (bpat, bcol, bn) in BASELINES.items():
         stat, p = dm_stat(d_t)
         delta = float(d_t.mean())
         sig = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
-        print(f"{bname:18s} {metric:7s} {delta:>+10.5f} {stat:>+8.3f} {p:>8.4f} {sig:4}")
-    print()
+        _print(f"{bname:18s} {metric:7s} {delta:>+10.5f} {stat:>+8.3f} {p:>8.4f} {sig:4}")
+    _print()
+
+_fh.close()
+print(f"\nSaved to {OUT_FILE}")

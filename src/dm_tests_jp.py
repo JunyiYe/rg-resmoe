@@ -77,18 +77,34 @@ def dm_test(diff):
 
 
 daily = {name: load_daily(pat, col, N_SEEDS) for name, (pat, col) in MODELS.items()}
-for name, series in daily.items():
-    print(f"{name}: {len(series)}/{N_SEEDS} seeds loaded")
+# Mirror the report to results/summary/ as well as stdout, same convention
+# as summarize_results.py / var_backtest.py / stress_slices.py.
+OUT_FILE = "results/summary/dm_tests_jp.txt"
+os.makedirs(os.path.dirname(OUT_FILE), exist_ok=True)
+_fh = open(OUT_FILE, "w")
 
-print(f"\n{'A':12s} {'B':8s} {'metric':6s} {'seed-mean diff':>16s} {'DM stat':>10s} {'p':>10s} {'n':>6s}")
+
+def _print(*args, **kwargs):
+    print(*args, **kwargs)
+    kwargs.pop("file", None)
+    print(*args, **kwargs, file=_fh)
+
+
+for name, series in daily.items():
+    _print(f"{name}: {len(series)}/{N_SEEDS} seeds loaded")
+
+_print(f"\n{'A':12s} {'B':8s} {'metric':6s} {'seed-mean diff':>16s} {'DM stat':>10s} {'p':>10s} {'n':>6s}")
 for a, b in PAIRS:
     if not daily[a] or not daily[b]:
         missing = a if not daily[a] else b
-        print(f"{a} vs {b}: skipped, no seeds loaded for {missing}")
+        _print(f"{a} vs {b}: skipped, no seeds loaded for {missing}")
         continue
     for metric in METRICS:
         a_df = pd.concat([s[metric] for s in daily[a]], axis=1).mean(axis=1)
         b_df = pd.concat([s[metric] for s in daily[b]], axis=1).mean(axis=1)
         d = (a_df - b_df).dropna()
         stat, p, n = dm_test(d)
-        print(f"{a:12s} {b:8s} {metric:6s} {d.mean():>16.5f} {stat:>10.2f} {p:>10.2e} {n:>6d}")
+        _print(f"{a:12s} {b:8s} {metric:6s} {d.mean():>16.5f} {stat:>10.2f} {p:>10.2e} {n:>6d}")
+
+_fh.close()
+print(f"\nSaved to {OUT_FILE}")
