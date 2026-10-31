@@ -64,9 +64,11 @@ pip install -r requirements.txt
 bash reproduce.sh          # builds the data panel, trains every model, aggregates results
 ```
 
-That reproduces the paper's main U.S. results end to end. It needs a CUDA
-GPU for training (one model/seed per GPU) and takes a while; each step
-skips work that's already done, so it's safe to stop and resume.
+That reproduces the paper's main U.S. results end to end: Table 3 (headline
+forecasting results), Table 4 (the regime-information pathway comparison),
+Table 7 (VaR coverage) and Table 8 (stress slices). It needs a CUDA GPU for
+training (one model/seed per GPU); each step skips work that's already done,
+so it's safe to stop and resume.
 
 Want more than the headline table?
 
@@ -74,6 +76,12 @@ Want more than the headline table?
 RUN_ABLATIONS=1 bash reproduce.sh   # + routing/design ablations (Tables 5-6)
 bash reproduce_jp.sh                # + the Japan replication (Table 9)
 ```
+
+Budget roughly, at 30 seeds: the default U.S. run is ~12 GB of per-seed
+prediction files and a few hours of GPU time (plus ~10 min of CPU for the
+per-stock GARCH fits); adding `RUN_ABLATIONS=1` takes it to ~32 GB, and the
+Japan replication adds ~11 GB. The feature panels themselves are ~1.5 GB.
+Everything lands under `data/processed/` and `results/`, both gitignored.
 
 ## What's inside
 
@@ -110,6 +118,10 @@ runnable command, in the order the tables need them.
   Newey-West lag 4).
 - The Japan replication reuses the hyperparameters selected on the U.S.
   data: the paper found the same configuration worked best on both.
+- `results/reference/` holds the paper's 30-seed numbers, with row labels
+  kept in step with the current scripts so a fresh run lines up directly.
+  One row is absent: `collapse_rate_by_model.csv` has no `RG-ResMoE-K6`,
+  because that variant was added after this reference was generated.
 
 ## Citation
 
