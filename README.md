@@ -80,7 +80,7 @@ bash reproduce_jp.sh                # + the Japan replication (Table 9)
 ```text
 src/                   Pipeline code: build the data panel, train each model, score results
 data/raw/              Daily U.S. stock prices (1,029 tickers), exactly what the paper used
-data/raw_jp/           Daily Japanese stock prices (1,555 tickers), for the replication study
+data/raw_jp/           Daily Japanese stock prices (1,552 tickers), for the replication study
 results/reference/     The paper's own output, so you can check your run against it
 ```
 
@@ -93,7 +93,9 @@ Everything else (`data/processed/`, `results/predictions/`,
 variables switch it into the other configurations reported in the paper:
 expert count, routing style, whether the gate sees regime info. The
 baselines and routing variants it's compared against live in
-`src/train_mlp.py`, `src/train_standard_moe.py`, and `src/train_rule_gate_moe.py`.
+`src/train_mlp.py`, `src/train_standard_moe.py`, `src/train_rule_gate_moe.py`,
+`src/train_ridge.py`, and `src/train_classical_baselines.py` (Persistence,
+HAR, GARCH).
 
 If you're trying to match a specific table or number in the paper, open
 `reproduce.sh` instead. It lists every model/flag combination as a single
