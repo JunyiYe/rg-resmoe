@@ -111,6 +111,30 @@ def load(pat, n):
     return out
 
 
+# daily_series() reads only Date, its prediction column, TARGET and RET, and
+# an inner merge keeps the reference's rows in their original order, so the
+# same per-day series gets rebuilt again and again: the reference's once per
+# (baseline, metric), and a single-seed classical baseline's once per
+# reference seed. Fingerprint exactly the columns the series depends on and
+# compute each distinct one once -- over 8 baselines x 6 metrics that is 6
+# passes over the reference instead of 48. Nothing is assumed about which
+# baselines cover the full panel: GARCH drops ~1.3k reference rows, so its
+# merge fingerprints differently and is computed on its own, as before.
+_series_cache = {}
+
+
+def cached_series(m, col, metric, sig):
+    key = (metric, col) + sig
+    out = _series_cache.get(key)
+    if out is None:
+        out = _series_cache[key] = daily_series(m, col, metric)
+    return out
+
+
+def col_sig(m, col, shared):
+    return shared + (hash(m[col].values.tobytes()),)
+
+
 # Mirror the report to results/summary/ as well as stdout, same convention
 # as summarize_results.py / var_backtest.py / stress_slices.py.
 OUT_FILE = "results/summary/dm_tests.txt"
@@ -137,21 +161,24 @@ for bname, (bpat, bcol, bn) in BASELINES.items():
     if not b_dfs:
         _print(f"{bname}: no files, skipped")
         continue
+    rcol = REF[2]
+    bc_m = bcol + "_b" if bcol == rcol else bcol
+    per_seed_diffs = {metric: [] for metric in METRICS}
+    for i, rdf in enumerate(ref_dfs):
+        bdf = b_dfs[min(i, len(b_dfs) - 1)]
+        m = rdf[["Date", "ticker", rcol]].merge(
+            bdf[["Date", "ticker", bcol, TARGET, RET]].rename(columns={bcol: bc_m}),
+            on=["Date", "ticker"])
+        shared = (len(m),) + tuple(
+            hash(m[c].values.tobytes()) for c in ("Date", TARGET, RET))
+        ref_sig, cmp_sig = col_sig(m, rcol, shared), col_sig(m, bc_m, shared)
+        for metric in METRICS:
+            dq = cached_series(m, rcol, metric, ref_sig)
+            db = cached_series(m, bc_m, metric, cmp_sig)
+            per_seed_diffs[metric].append((dq - db).dropna())
     for metric in METRICS:
-        per_seed_diffs = []
-        for i, rdf in enumerate(ref_dfs):
-            bdf = b_dfs[min(i, len(b_dfs) - 1)]
-            rcol, bc = REF[2], bcol
-            bc_m = bc + "_b" if bc == rcol else bc
-            m = rdf[["Date", "ticker", rcol]].merge(
-                bdf[["Date", "ticker", bcol, TARGET, RET]].rename(columns={bcol: bc_m}),
-                on=["Date", "ticker"])
-            dq = daily_series(m, rcol, metric)
-            db = daily_series(m, bc_m, metric)
-            diff = (dq - db).dropna()
-            per_seed_diffs.append(diff)
         # Average the per-day differences across seeds, then one DM test.
-        d_t = pd.concat(per_seed_diffs, axis=1).mean(axis=1).dropna().values
+        d_t = pd.concat(per_seed_diffs[metric], axis=1).mean(axis=1).dropna().values
         stat, p = dm_stat(d_t)
         delta = float(d_t.mean())
         sig = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
