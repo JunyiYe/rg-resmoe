@@ -74,8 +74,12 @@ def _fmt(vals, fmt=".4f", width=16):
         # A one-seed run has no spread; show the value alone rather than a
         # misleading "+/-0.0000". Same convention as summarize_results.py.
         return ("{:" + str(width) + fmt + "}").format(arr[0])
-    s = format(arr.mean(), fmt) + " +/-" + format(arr.std(), fmt)
-    return (s + " " * width)[:width]
+    # Pad to the column width but never cut: a collapsed model's QLIKE std
+    # runs to five or six digits, and clipping to width dropped them (leaving
+    # a dangling "+/-5618."). An over-wide cell shifts the rest of its own row
+    # rather than hiding significant figures. Same convention as
+    # summarize_results.py.
+    return (format(arr.mean(), fmt) + " +/-" + format(arr.std(), fmt)).ljust(width)
 
 
 os.makedirs(os.path.dirname(OUT_FILE), exist_ok=True)

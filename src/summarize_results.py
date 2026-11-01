@@ -129,8 +129,11 @@ def _fmt(vals, fmt=".4f"):
     arr = np.array([v for v in vals if np.isfinite(v)])
     if len(arr) == 0: return "—".rjust(W)
     if len(arr) == 1: return ("{:" + str(W) + fmt + "}").format(arr[0])
-    s = format(arr.mean(), fmt) + " +/-" + format(arr.std(), fmt)
-    return (s + " " * W)[:W]
+    # Pad to the column width but never cut: a collapsed model's QLIKE std
+    # runs to five or six digits, and clipping to W dropped them (leaving a
+    # dangling "+/-17562"). An over-wide cell shifts the rest of its own row
+    # rather than hiding significant figures.
+    return (format(arr.mean(), fmt) + " +/-" + format(arr.std(), fmt)).ljust(W)
 
 for name, rows in cache.items():
     if not rows:
