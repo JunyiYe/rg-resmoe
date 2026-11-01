@@ -62,9 +62,19 @@ def dm_test(diff):
     return stat, 2*(1 - norm.cdf(abs(stat)))
 
 
-def build_slices():
+def build_slices(scored_dates):
+    """Slice definitions, taken over the dates actually scored.
+
+    The decile cut and the high/low median split describe the evaluated
+    sample, so they have to be computed on the test dates alone. Taken over
+    the whole panel they would fold in the ~2-year warm-up prefix that no
+    walk-forward window ever scores: the "top decile" then covers 242 of the
+    1,890 scored days (12.8%) instead of a decile of them, and the regime
+    median shifts with dates that never enter the comparison.
+    """
     panel = pd.read_parquet(f"{PROCESSED_DIR}/panel_systemic.parquet", columns=["Date", "market_vol_20"])
     mvol = panel.groupby("Date")["market_vol_20"].first().sort_index()
+    mvol = mvol.reindex(pd.DatetimeIndex(sorted(scored_dates))).dropna()
     dates = mvol.index.values
 
     top_decile = set(mvol[mvol >= mvol.quantile(0.90)].index)
@@ -107,7 +117,6 @@ def _print(*args, **kwargs):
     print(*args, **kwargs)
     print(*args, **kwargs, file=_fh)
 
-slices = build_slices()
 ref_daily = daily_ic_per_seed(REF, REF_COL, N_SEEDS)
 cmp_daily = daily_ic_per_seed(CMP, CMP_COL, N_SEEDS)
 _print(f"RG-ResMoE: {len(ref_daily)}/{N_SEEDS} seeds loaded, MLP-L: {len(cmp_daily)}/{N_SEEDS} seeds loaded")
@@ -115,6 +124,10 @@ _print(f"RG-ResMoE: {len(ref_daily)}/{N_SEEDS} seeds loaded, MLP-L: {len(cmp_dai
 ref_mean = pd.concat(ref_daily, axis=1).mean(axis=1)
 cmp_mean = pd.concat(cmp_daily, axis=1).mean(axis=1)
 diff = (ref_mean - cmp_mean).dropna()
+
+# Slices are defined on diff's dates, i.e. the days both models actually
+# scored, so every cut describes the sample the comparison runs on.
+slices = build_slices(diff.index)
 
 full_sample_delta = None
 _print(f"\n{'Slice':24s}  {'Days':>6}  {'Delta IC':>10}  {'Rel. gain':>10}  {'p':>10}")
