@@ -1,7 +1,7 @@
 # RG-ResMoE
 
 **Regime-Gated Residual Mixture-of-Experts for Cross-Sectional Volatility Forecasting**
-Junyi Ye, Gargi Vijay Borde · ICAIF '26 · [paper PDF](paper/RG-ResMoE_ICAIF26.pdf) · [doi:10.1145/3858063.3858798](https://doi.org/10.1145/3858063.3858798)
+Junyi Ye, Gargi Vijay Borde · ICAIF '26 · [paper PDF](paper/RG-ResMoE_ICAIF26.pdf) · [doi:10.1145/3858063.3858798](https://doi.org/10.1145/3858063.3858798) · [poster](presentation/ICAIF26_Poster_RG-ResMoE.pdf) · [slides](presentation/ICAIF26_Slides_RG-ResMoE.pdf)
 
 This repo contains the code and data behind the paper. It forecasts
 five-day stock volatility for over 1,000 U.S. equities, and shows that a
