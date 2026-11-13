@@ -10,34 +10,26 @@ only to *route* between experts, never fed into the forecast itself.
 
 ## Why this paper
 
-Financial markets move through regimes: calm periods, crises, recoveries.
-A growing line of work uses mixture-of-experts (MoE) architectures to
-handle this, on the idea that different experts can specialize in
-different market conditions. These models often beat plain baselines.
-But it's rarely clear *why*.
+Financial markets move through regimes: calm periods, crises, recoveries. A growing line of work uses mixture-of-experts (MoE) architectures to handle this, on the idea that different experts can specialize in different market conditions. These models often beat plain baselines. But it is rarely clear why.
 
-A typical MoE setup changes three things at once relative to its baseline.
-It exposes the model to regime information it didn't have before. It adds
-parameters, usually a lot of them, since an MoE baseline is commonly
-compared against a much smaller plain MLP rather than one with a matching
-parameter count. And it introduces a new mechanism: routing between
-specialized sub-models. Any of the three could be driving the improvement,
-but most papers compare against an MLP with far fewer parameters, so
-capacity and architecture are never actually separated.
+Relative to its baseline, a typical MoE changes three things at once:
 
-This paper isolates that question. Every model we compare has a matched
-parameter budget, the same regime information available to it, and the
-same tuning/evaluation protocol. The only thing we vary is *how*, and
-*whether*, regime information reaches the model. That lets us ask
-cleanly: does the gain come from having the information, from having more
-capacity, or from the gating/expert architecture itself?
+- **Information:** the gate sees regime variables the baseline never had.
+- **Capacity:** the MoE has more parameters, and is often compared against a smaller single network.
+- **Architecture:** it routes between specialized sub-models.
 
-The answer is the architecture, not capacity. Against a plain MLP with the
-*same* parameter count as RG-ResMoE, giving that MLP the same regime
-variables at its input still hurts it, while routing those same variables
-through an MoE gate helps. Same information, same capacity, opposite
-outcome. The benefit comes from *where* the information enters the model,
-not from how much of it there is, and not from having more parameters.
+Any of the three could be driving the improvement. When they change together, the gain cannot be attributed, and the explanation offered for it may simply be wrong.
+
+This paper separates them. The regime variables are fixed, the key baseline is an MLP with the same parameter count as RG-ResMoE, and every model shares the same features, walk-forward protocol, tuning rules and 30 random seeds. We then vary one factor at a time: where regime information enters (input, gate, or not at all), how experts are routed (soft or hard), and whether experts predict full forecasts or residual corrections to a frozen base forecast.
+
+**The answer is the architecture, not capacity or information.**
+
+- **Information alone does not help.** Giving the capacity-matched MLP the regime variables at its input lowers IC (−0.0043) and makes all 30 seeds collapse.
+- **Capacity alone does not explain it.** The capacity-matched MLP is worse than RG-ResMoE on every forecast metric.
+- **The residual architecture does.** A frozen base forecaster with zero-initialized correction experts beats the capacity-matched MLP by +0.0048 IC and never collapses. Without the frozen base (a standard MoE), 24 of 30 seeds collapse; with random instead of zero initialization, 13 of 30.
+- **Where the information enters still matters, but for safety.** Appended to the input, the regime variables hurt; routed through the gate, they do not.
+
+Same information, same capacity: whether regime variables help or hurt depends on where they enter, and the gain itself comes from the residual design.
 
 ## How it works
 
