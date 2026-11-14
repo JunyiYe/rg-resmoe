@@ -125,9 +125,11 @@ If you find this repo useful, please consider giving it a star ⭐ and citing th
   author    = {Ye, Junyi and Borde, Gargi Vijay},
   booktitle = {Proceedings of the 7th ACM International Conference on AI in Finance (ICAIF '26)},
   year      = {2026},
+  pages     = {1687--1694},
   address   = {Milan, Italy},
   publisher = {ACM},
-  doi       = {10.1145/3858063.3858798}
+  doi       = {10.1145/3858063.3858798},
+  url       = {https://doi.org/10.1145/3858063.3858798}
 }
 ```
 
